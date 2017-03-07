@@ -1,0 +1,34 @@
+---
+title: "Meteorite Landings"
+author: "Jasmine Dumas (jasmine.dumas@gmail.com)"
+date: "2017-03-07"
+output: html_notebook
+---
+
+## Summary
+
+This comprehensive data set from The Meteorological Society contains information on all of the known meteorite landings. 
+
+
+## Analysis
+
+The goal of this analysis is to create an insightful and interactive data visualization which draws some inference about meteorite landing locations, mass, and year of occurrence. 
+```{r}
+library(ggplot2)
+library(RSocrata)
+library(devtools)
+library(gganimate)
+library(plotly)
+```
+
+```{r}
+data_in <- read.socrata("https://data.nasa.gov/Space-Science/Meteorite-Landings/gh4g-9sfh")
+```
+
+```{r}
+head(data_in)
+```
+
+## Visualization
+
+## Insights
