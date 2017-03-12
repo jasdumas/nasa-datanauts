@@ -103,7 +103,7 @@ gganimate(p, "meteorite-landings.gif")
 
 ## Insights
 
-* Dominate areas where meteorites were found are: Australia, USA, and Antarctica
+* Dominant areas where meteorites were found are: Australia, USA, and Antarctica
 
 
 ## Resources

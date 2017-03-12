@@ -160,7 +160,7 @@ Visualizations
 Insights
 --------
 
--   Dominate areas where meteorites were found are: Australia, USA, and
+-   Dominant areas where meteorites were found are: Australia, USA, and
     Antarctica
 
 Resources
