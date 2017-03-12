@@ -1,24 +1,30 @@
 ---
 title: "Meteorite Landings"
 author: "Jasmine Dumas (jasmine.dumas@gmail.com)"
-date: "2017-03-07"
-output: html_notebook
+date: "2017-03-11"
+output: md_document
 ---
+
+# Meteorite Landings
 
 ## Summary
 
 This comprehensive data set from The Meteorological Society contains information on all of the known meteorite landings. 
 
-
 ## Analysis
 
 The goal of this analysis is to create an insightful and interactive data visualization which draws some inference about meteorite landing locations, mass, and year of occurrence. 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(RSocrata)
 library(devtools)
 library(gganimate)
-library(plotly)
+library(magick)
+library(dplyr)
+library(ggmap)
+library(gapminder)
+library(animation)
+library(lubridate)
 ```
 
 ```{r}
@@ -29,6 +35,85 @@ data_in <- read.socrata("https://data.nasa.gov/Space-Science/Meteorite-Landings/
 head(data_in)
 ```
 
-## Visualization
+### Clean up column names
+```{r}
+names(data_in)[c(3, 4, 5, 6, 8, 9)] <- c("name_type", "class", "mass", "found", "latitude", "longitude")
+names(data_in)
+```
+### Fix the year by removing MM-DD
+```{r}
+data_in$year_fix <- year(data_in$year)
+```
+### Explore the variables by class distribution
+```{r}
+data_in %>% group_by(class) %>% 
+            summarise(n = n()) %>% 
+            arrange(desc(n))
+```
+
+```{r}
+data_in %>% group_by(name_type) %>% 
+            summarise(n = n()) %>% 
+            arrange(desc(n))
+```
+
+### Filter out erroneous latitudes and longitudes
+```{r}
+data_in_clean <- data_in %>% filter(latitude >= -90 & 
+                                    latitude  <= 90 & 
+                                    longitude >= -180 &
+                                    longitude <= 180  & 
+                                    !is.na(mass), 
+                                    !is.na(year))
+```
+
+### Clean up method of whether the meteorite was Found or not
+```{r}
+data_in_clean$found <- if_else(data_in_clean$found == "Fell", "No", "Yes")
+```
+
+
+## Visualizations
+
+### Set up some options for plotting
+```{r}
+theme_set(theme_minimal())
+
+options(scipen=10000)
+```
+
+### Static display
+```{r}
+p <- ggplot() +
+    borders("world", colour="gray50") +
+    geom_point(aes(x = longitude, y = latitude, color = found, frame = year_fix), data = data_in_clean, alpha = .5) +
+    labs(title = "Worldwide Meteorite Landings ", 
+       x = "", y = "") +
+    theme(legend.position="bottom", 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+p
+```
+
+
+```{r, fig.show = "animate"}
+gganimate(p, "meteorite-landings.gif")
+```
 
 ## Insights
+
+* Dominate areas where meteorites were found are: Australia, USA, and Antarctica
+
+
+## Resources
+
+*I reused some code and modified examples from:*
+
+1. [https://rpubs.com/MVellinger/Gibeon](https://rpubs.com/MVellinger/Gibeon)
+
+2. [http://relevantmisc.com/ggplot/instagram/2016/02/14/ig-over-time/](http://relevantmisc.com/ggplot/instagram/2016/02/14/ig-over-time/)
+
+3. [https://rpubs.com/sjackman/gapminder-gganimate](https://rpubs.com/sjackman/gapminder-gganimate)
+
+*Thanks to [Bob Rudis](https://twitter.com/hrbrmstr/status/840622466707922944) for helping me to get ImageMagick installed (Twitter is a powerful resource)*
